@@ -22,7 +22,7 @@ namespace {
 
     class object final {
     public:
-        template<typename T/*, typename P*/>
+        template<typename T>
         explicit object(T t) : self_ (new model<T>(std::move(t))) {}
 
         object(const object& o) : self_(o.self_->copy_()) {}
@@ -51,7 +51,7 @@ namespace {
 
         template<typename T/*, typename P*/>
         struct model final : base {
-            explicit model(T t/*, P* p*/) : data_(std::move(t))/*, params_(p)*/ {}
+            explicit model(T t) : data_(std::move(t)) {}
             [[nodiscard]] base* copy_() const override { return new model(*this); }
             void print_(std::ostream& out, const std::size_t position) const override {
                 print(data_, out, position);
@@ -60,7 +60,6 @@ namespace {
                 inject(data_);
             }
             T data_;
-            //P* params_;
         };
         std::unique_ptr<base> self_;
     };
@@ -126,7 +125,7 @@ namespace {
         void do_something() {
             const auto& db = Database::instance();
             const object& o = db.get(Database::trigger_types::type1);
-            inject(o); // this will change 0xFF of the buffer to be 0xFF
+            inject(o); // this will change [0] of the buffer to be 0xFF (was 0x00 initially)
         }
     };
 
